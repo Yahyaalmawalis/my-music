@@ -1,14 +1,14 @@
 <!doctype html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>قائمتي الموسيقية</title>
-<meta name="description" content="استمع إلى قائمتي الموسيقية مباشرة">
-<meta property="og:title" content="قائمتي الموسيقية">
-<meta property="og:description" content="افتح الرابط واستمع مباشرة 🎧">
+<title>My Playlist</title>
+<meta name="description" content="Listen to my playlist live">
+<meta property="og:title" content="My Playlist">
+<meta property="og:description" content="Open the link and start listening 🎧">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --glass: rgba(255, 255, 255, 0.10);
@@ -20,7 +20,7 @@
   * { box-sizing: border-box; margin: 0; }
   html, body { min-height: 100%; }
   body {
-    font-family: "IBM Plex Sans Arabic", system-ui, sans-serif;
+    font-family: "Inter", system-ui, sans-serif;
     color: var(--text);
     background: #0b0b12;
     display: flex;
@@ -32,7 +32,7 @@
     overflow-x: hidden;
   }
 
-  /* خلفية متحركة من غلاف القائمة */
+  /* Animated background from the playlist cover */
   .bg {
     position: fixed; inset: -20%;
     background-size: cover; background-position: center;
@@ -51,7 +51,7 @@
   @keyframes drift { to { transform: scale(1.3) rotate(8deg); } }
   @keyframes float { to { transform: translate(8vmax, 6vmax) scale(1.15); } }
 
-  /* بطاقة الزجاج السائل */
+  /* Liquid glass card */
   .card {
     position: relative;
     width: 100%; max-width: 480px;
@@ -67,7 +67,7 @@
       0 30px 80px rgba(0,0,0,.45);
     overflow: hidden;
   }
-  .card::before { /* لمعة الزجاج */
+  .card::before { /* Glass highlight */
     content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
     background: radial-gradient(120% 60% at 80% 0%, rgba(255,255,255,.28), transparent 55%);
   }
@@ -142,38 +142,38 @@
     <div class="head">
       <img class="cover" id="cover" alt="">
       <div>
-        <span class="live"><i></i> بث مباشر</span>
-        <h1 id="title">قائمتي الموسيقية</h1>
-        <p class="sub">اضغط تشغيل أو اختر أي أغنية من القائمة</p>
+        <span class="live"><i></i> LIVE</span>
+        <h1 id="title">My Playlist</h1>
+        <p class="sub">Hit play or pick any song from the list</p>
       </div>
     </div>
 
     <div class="actions">
       <button class="btn primary" id="playBtn">
         <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-        <span id="playText">تشغيل</span>
+        <span id="playText">Play</span>
       </button>
       <button class="btn" id="shareBtn">
         <svg viewBox="0 0 24 24"><path d="M18 16a3 3 0 0 0-2.4 1.2l-6.7-3.4a3 3 0 0 0 0-1.6l6.7-3.4A3 3 0 1 0 15 7l-6.7 3.4a3 3 0 1 0 0 3.2L15 17a3 3 0 1 0 3-1z"/></svg>
-        مشاركة
+        Share
       </button>
     </div>
 
     <div class="player"><div id="embed"></div></div>
 
-    <p class="foot">للاستماع الكامل سجّل دخولك في <a href="https://open.spotify.com" target="_blank" rel="noopener">Spotify</a> على نفس المتصفح</p>
+    <p class="foot">Log in to <a href="https://open.spotify.com" target="_blank" rel="noopener">Spotify</a> in this browser to hear full tracks</p>
   </main>
 
-  <div class="toast" id="toast">تم نسخ الرابط ✓</div>
+  <div class="toast" id="toast">Link copied ✓</div>
 
 <script>
-  // ← لتغيير القائمة: ضع معرّف البلاي ليست هنا (الجزء بعد /playlist/ في الرابط)
+  // To change the playlist, put its ID here (the part after /playlist/ in the link)
   const PLAYLIST_ID = "57XLVugqKJUprz75AGw4uV";
   const PLAYLIST_URL = "https://open.spotify.com/playlist/" + PLAYLIST_ID;
 
   const $ = id => document.getElementById(id);
 
-  // جلب الاسم والغلاف تلقائيًا (يتحدّث لو غيّرت القائمة في سبوتيفاي)
+  // Fetch title and cover automatically (stays in sync with Spotify)
   fetch("https://open.spotify.com/oembed?url=" + encodeURIComponent(PLAYLIST_URL))
     .then(r => r.json())
     .then(d => {
@@ -185,7 +185,7 @@
     })
     .catch(() => {});
 
-  // مشغّل سبوتيفاي
+  // Spotify player
   let controller = null, paused = true;
   window.onSpotifyIframeApiReady = IFrameAPI => {
     IFrameAPI.createController($("embed"),
@@ -194,7 +194,7 @@
         controller = c;
         c.addListener("playback_update", e => {
           paused = e.data.isPaused;
-          $("playText").textContent = paused ? "تشغيل" : "إيقاف مؤقت";
+          $("playText").textContent = paused ? "Play" : "Pause";
           $("playIcon").innerHTML = paused
             ? '<path d="M8 5v14l11-7z"/>'
             : '<path d="M6 5h4v14H6zm8 0h4v14h-4z"/>';

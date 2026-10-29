@@ -171,6 +171,9 @@
     catch { window.prompt("انسخ هذا النص:", text); }
   };
 
+  /* the link people share: opens the Ask page straight away, no sign-in */
+  const shareLink = () => `${location.origin}${location.pathname}#ask`;
+
   /* ---------- theme ---------- */
   const root = document.documentElement;
   const applyTheme = (t) => { root.setAttribute("data-theme", t === "dark" ? "dark" : "light"); document.querySelector('meta[name="theme-color"]').content = t === "dark" ? "#0b0b0d" : "#ffffff"; };
@@ -185,7 +188,7 @@
   let afterSignIn = "home";            // where a guest lands after leaving the sign-in page
   const route = () => {
     const name = (location.hash.replace("#", "") || "home").split("?")[0];
-    let target = views.some(v => v.dataset.view === name) ? name : "home";
+    let target = name === "ask" ? "home" : views.some(v => v.dataset.view === name) ? name : "home";
     if (target === "signin" && unlocked) { history.replaceState(null, "", "#inbox"); target = "inbox"; }
     views.forEach(v => { v.hidden = v.dataset.view !== target; });
     document.body.classList.toggle("is-auth", target === "signin");
@@ -330,6 +333,11 @@
     $("#profileEmpty").hidden = loading || answered.length > 0;
     $(".see-all").hidden = answered.length <= 3;
   };
+  $("#heroCopy").addEventListener("click", () => {
+    copy(shareLink(), "تم نسخ الرابط");
+    const b = $("#heroCopy"); b.classList.add("is-done"); b.querySelector(".copy-label").textContent = "Copied";
+    setTimeout(() => { b.classList.remove("is-done"); b.querySelector(".copy-label").textContent = "Copy link"; }, 2000);
+  });
   $("#pCopy").addEventListener("click", () => copy(`${location.origin}${location.pathname}#profile`, "تم نسخ رابط الملف الشخصي"));
 
   /* ---------- inbox ---------- */
@@ -449,7 +457,7 @@
   $$(".filter").forEach(b => b.addEventListener("click", () => {
     filter = b.dataset.filter; $$(".filter").forEach(x => x.classList.toggle("is-active", x === b)); renderInbox();
   }));
-  $("#copyLink").addEventListener("click", () => copy(`${location.origin}${location.pathname}#home`, "تم نسخ رابطك"));
+  $("#copyLink").addEventListener("click", () => copy(shareLink(), "تم نسخ رابطك، أرسله لأي شخص ليسألك مباشرة"));
 
   /* ---------- settings ---------- */
   const sheet = $("#settingsSheet");
@@ -484,6 +492,8 @@
     } catch (error) { fail("لم تُحفظ الإعدادات. حاول مرة أخرى.", error); }
   });
   $("#clearSamples").addEventListener("click", () => { store.removeSamples(); toast("تم حذف الأسئلة التجريبية"); closeSettings(); rerender(); });
+
+  $("#shareUrl").textContent = shareLink().replace(/^https?:\/\//, "");
 
   /* ---------- remote-mode labels ---------- */
   if (remote) {
@@ -522,9 +532,11 @@
         toast("تعذّر الاتصال بقاعدة البيانات.");
       }
     }
-    const entry = (location.hash.replace("#", "") || "home");
-    if (!unlocked && sessionStorage.getItem(KEY_GUEST) !== "1" && entry !== "signin") {
-      afterSignIn = entry;
+    const entry = location.hash.replace("#", "");
+    const sharedLink = entry !== "" && entry !== "home" && entry !== "signin";
+    if (sharedLink) sessionStorage.setItem(KEY_GUEST, "1");
+    if (!unlocked && !sharedLink && sessionStorage.getItem(KEY_GUEST) !== "1" && entry !== "signin") {
+      afterSignIn = "home";
       history.replaceState(null, "", "#signin");
     }
     route();

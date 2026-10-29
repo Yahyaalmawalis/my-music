@@ -24,15 +24,15 @@
   };
 
   const SAMPLES = [
-    { id: "s1", text: "What's one habit that changed your life more than you expected?", status: "answered",
-      answer: "Walking without headphones. Twenty minutes of nothing turned out to be where all my ideas were hiding.",
+    { id: "s1", text: "ما العادة الوحيدة التي غيّرت حياتك أكثر مما توقعت؟", status: "answered",
+      answer: "المشي بلا سماعات. تبيّن أن عشرين دقيقة من اللاشيء هي المكان الذي كانت تختبئ فيه كل أفكاري.",
       createdAt: Date.now() - 1000 * 60 * 60 * 30, answeredAt: Date.now() - 1000 * 60 * 60 * 26, sample: true },
-    { id: "s2", text: "Be honest: do you actually read every question you get?", status: "answered",
-      answer: "Every single one. I don't answer every one, but I read them all, usually at night with tea.",
+    { id: "s2", text: "بصراحة: هل تقرأ فعلًا كل سؤال يصلك؟", status: "answered",
+      answer: "كل واحد منها. لا أجيب عنها كلها، لكنني أقرؤها جميعًا، غالبًا في الليل مع كوب شاي.",
       createdAt: Date.now() - 1000 * 60 * 60 * 9, answeredAt: Date.now() - 1000 * 60 * 60 * 7, sample: true },
-    { id: "s3", text: "Which song do you have on repeat right now?", status: "open",
+    { id: "s3", text: "أي أغنية تكررها هذه الأيام؟", status: "open",
       createdAt: Date.now() - 1000 * 60 * 42, sample: true },
-    { id: "s4", text: "If you could restart one project from scratch, which one and why?", status: "open",
+    { id: "s4", text: "لو أعدت مشروعًا واحدًا من الصفر، أيّها تختار ولماذا؟", status: "open",
       createdAt: Date.now() - 1000 * 60 * 6, sample: true },
   ];
 
@@ -48,7 +48,7 @@
   };
 
   let profile = Object.assign(
-    { name: "Yahya Al Mawali", handle: "@Yahya", bio: "Ask me anything. I answer the good ones in public, the rest stay between us.", pass: "1234" },
+    { name: "يحيى المعولي", handle: "@Yahya", bio: "اسألني أي شيء. أجيب عن الأسئلة الجميلة علنًا، والباقي يبقى بيننا.", pass: "1234" },
     safe.get(KEY_P, {})
   );
 
@@ -56,11 +56,11 @@
   const uid = () => (crypto.randomUUID ? crypto.randomUUID() : "q" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8));
   const timeAgo = (ts) => {
     const s = Math.max(1, Math.round((Date.now() - ts) / 1000));
-    if (s < 60) return "just now";
-    const m = Math.round(s / 60); if (m < 60) return `${m}m ago`;
-    const h = Math.round(m / 60); if (h < 24) return `${h}h ago`;
-    const d = Math.round(h / 24); if (d < 7) return `${d}d ago`;
-    return new Date(ts).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    if (s < 60) return "الآن";
+    const m = Math.round(s / 60); if (m < 60) return `قبل ${m} د`;
+    const h = Math.round(m / 60); if (h < 24) return `قبل ${h} س`;
+    const d = Math.round(h / 24); if (d < 7) return `قبل ${d} ي`;
+    return new Date(ts).toLocaleDateString("ar", { month: "short", day: "numeric" });
   };
   let toastTimer;
   const toast = (msg) => {
@@ -69,7 +69,7 @@
   };
   const copy = async (text, okMsg) => {
     try { await navigator.clipboard.writeText(text); toast(okMsg); }
-    catch { window.prompt("Copy this:", text); }
+    catch { window.prompt("انسخ هذا النص:", text); }
   };
 
   /* ---------- theme ---------- */
@@ -126,8 +126,8 @@
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     const text = ta.value.trim().replace(/\s+\n/g, "\n");
-    if (text.length < 3) { err.textContent = "Write at least a few characters first."; err.hidden = false; ta.focus(); return; }
-    if (Date.now() - lastSent < 4000) { err.textContent = "Easy there — wait a few seconds between questions."; err.hidden = false; return; }
+    if (text.length < 3) { err.textContent = "اكتب بضعة أحرف على الأقل أولًا."; err.hidden = false; ta.focus(); return; }
+    if (Date.now() - lastSent < 4000) { err.textContent = "على مهلك، انتظر بضع ثوانٍ بين سؤال وآخر."; err.hidden = false; return; }
     sendBtn.disabled = true; sendBtn.classList.add("is-busy");
     setTimeout(() => {
       storage.add({ id: uid(), text, status: "open", createdAt: Date.now() });
@@ -149,8 +149,8 @@
     $(".q-time", node).dateTime = new Date(q.createdAt).toISOString();
     $(".q-text", node).textContent = q.text;
     const badge = $(".badge", node);
-    if (q.sample && owner) { badge.textContent = "Sample"; badge.classList.add("is-sample"); }
-    else if (owner) { badge.textContent = q.status === "open" ? "New" : q.status; badge.classList.add(`is-${q.status}`); }
+    if (q.sample && owner) { badge.textContent = "تجريبي"; badge.classList.add("is-sample"); }
+    else if (owner) { badge.textContent = { open: "جديد", answered: "مُجاب", archived: "مؤرشف" }[q.status]; badge.classList.add(`is-${q.status}`); }
     else badge.remove();
 
     if (q.answer) { $(".q-answer", node).hidden = false; $(".a-text", node).textContent = q.answer; }
@@ -160,7 +160,7 @@
 
     if (!owner) {
       node.classList.add("answers-card");
-      btn("Share", "", () => copy(`Q: ${q.text}\nA: ${q.answer}\n${location.origin}${location.pathname}#answers`, "Copied to clipboard"));
+      btn("مشاركة", "", () => copy(`س: ${q.text}\nج: ${q.answer}\n${location.origin}${location.pathname}#answers`, "تم النسخ"));
       return node;
     }
 
@@ -171,17 +171,17 @@
       const a = replyInput.value.trim();
       if (!a) { replyInput.focus(); return; }
       storage.update(q.id, { answer: a, status: "answered", answeredAt: Date.now() });
-      toast("Answer published"); renderInbox();
+      toast("تم نشر الإجابة"); renderInbox();
     });
 
-    if (q.status === "open") btn("Answer", "", openReply);
-    if (q.status === "answered") btn("Edit answer", "", openReply);
-    if (q.status !== "archived") btn("Archive", "", () => { storage.update(q.id, { status: "archived" }); renderInbox(); });
-    else btn("Restore", "", () => { storage.update(q.id, { status: q.answer ? "answered" : "open" }); renderInbox(); });
-    btn("Copy", "", () => copy(q.text, "Question copied"));
-    const del = btn("Delete", "", () => {
-      if (!del.classList.contains("is-confirm")) { del.classList.add("is-confirm"); del.textContent = "Really delete?"; setTimeout(() => { del.classList.remove("is-confirm"); del.textContent = "Delete"; }, 2500); return; }
-      storage.remove(q.id); toast("Deleted"); renderInbox();
+    if (q.status === "open") btn("إجابة", "", openReply);
+    if (q.status === "answered") btn("تعديل الإجابة", "", openReply);
+    if (q.status !== "archived") btn("أرشفة", "", () => { storage.update(q.id, { status: "archived" }); renderInbox(); });
+    else btn("استعادة", "", () => { storage.update(q.id, { status: q.answer ? "answered" : "open" }); renderInbox(); });
+    btn("نسخ", "", () => copy(q.text, "تم نسخ السؤال"));
+    const del = btn("حذف", "", () => {
+      if (!del.classList.contains("is-confirm")) { del.classList.add("is-confirm"); del.textContent = "تأكيد الحذف؟"; setTimeout(() => { del.classList.remove("is-confirm"); del.textContent = "حذف"; }, 2500); return; }
+      storage.remove(q.id); toast("تم الحذف"); renderInbox();
     });
     return node;
   };
@@ -202,7 +202,7 @@
     if (!unlocked) return;
     const all = storage.list();
     const open = all.filter(q => q.status === "open").length;
-    $("#inboxLede").textContent = open === 0 ? "Nothing waiting — nice." : `${open} question${open === 1 ? "" : "s"} waiting`;
+    $("#inboxLede").textContent = open === 0 ? "لا شيء بانتظارك، رائع." : open === 1 ? "سؤال واحد بانتظارك" : open === 2 ? "سؤالان بانتظارك" : open <= 10 ? `${open} أسئلة بانتظارك` : `${open} سؤالًا بانتظارك`;
     const list = all.filter(q => filter === "all" ? q.status !== "archived" : q.status === filter);
     const feed = $("#inboxFeed"); feed.replaceChildren();
     list.forEach((q, i) => { const c = makeCard(q, { owner: true }); c.style.animationDelay = `${Math.min(i, 8) * 40}ms`; feed.appendChild(c); });
@@ -227,10 +227,10 @@
     e.preventDefault();
     const u = normHandle($("#loginUser").value), p = $("#loginPass").value;
     const nameMatch = u === normHandle(profile.handle) || u === profile.name.trim().toLowerCase();
-    if (!u || !p) { $("#loginError").textContent = "Enter your username and passcode."; $("#loginError").hidden = false; return; }
-    if (!nameMatch || p !== profile.pass) { $("#loginError").textContent = "Username or passcode doesn't match."; $("#loginError").hidden = false; $("#loginPass").select(); return; }
+    if (!u || !p) { $("#loginError").textContent = "أدخل اسم المستخدم ورمز الدخول."; $("#loginError").hidden = false; return; }
+    if (!nameMatch || p !== profile.pass) { $("#loginError").textContent = "اسم المستخدم أو رمز الدخول غير صحيح."; $("#loginError").hidden = false; $("#loginPass").select(); return; }
     unlocked = true; sessionStorage.setItem(KEY_UNLOCK, "1"); sessionStorage.removeItem(KEY_GUEST);
-    closeLogin(); renderAuth(); toast(`Welcome back, ${profile.name.split(" ")[0]}`);
+    closeLogin(); renderAuth(); toast(`أهلًا بعودتك، ${profile.name.split(" ")[0]}`);
     location.hash = "#inbox"; renderInbox();
   });
   $("#loginGuest").addEventListener("click", () => { sessionStorage.setItem(KEY_GUEST, "1"); closeLogin(); ta.focus(); });
@@ -241,12 +241,12 @@
 
   $("#lockBtn").addEventListener("click", () => {
     unlocked = false; sessionStorage.removeItem(KEY_UNLOCK); sessionStorage.setItem(KEY_GUEST, "1");
-    renderAuth(); toast("Signed out"); location.hash = "#home"; renderInbox();
+    renderAuth(); toast("تم تسجيل الخروج"); location.hash = "#home"; renderInbox();
   });
   $$(".filter").forEach(b => b.addEventListener("click", () => {
     filter = b.dataset.filter; $$(".filter").forEach(x => x.classList.toggle("is-active", x === b)); renderInbox();
   }));
-  $("#copyLink").addEventListener("click", () => copy(`${location.origin}${location.pathname}#home`, "Your ask link is copied"));
+  $("#copyLink").addEventListener("click", () => copy(`${location.origin}${location.pathname}#home`, "تم نسخ رابطك"));
 
   /* ---------- settings ---------- */
   const sheet = $("#settingsSheet");
@@ -271,9 +271,9 @@
     if (handle && !handle.startsWith("@")) handle = "@" + handle;
     profile = { ...profile, name: $("#setName").value.trim() || profile.name, handle: handle || profile.handle, bio: $("#setBio").value.trim(), ...(pass ? { pass } : {}) };
     safe.set(KEY_P, profile);
-    toast("Settings saved"); closeSettings(); renderProfile(); renderAuth(); renderInbox();
+    toast("تم حفظ الإعدادات"); closeSettings(); renderProfile(); renderAuth(); renderInbox();
   });
-  $("#clearSamples").addEventListener("click", () => { storage.removeSamples(); toast("Sample questions removed"); closeSettings(); renderInbox(); renderProfile(); });
+  $("#clearSamples").addEventListener("click", () => { storage.removeSamples(); toast("تم حذف الأسئلة التجريبية"); closeSettings(); renderInbox(); renderProfile(); });
 
   /* ---------- boot ---------- */
   updateCounter();

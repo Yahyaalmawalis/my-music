@@ -95,6 +95,7 @@
     else stopSlides();
     if (target === "answers") renderAnswers();
     if (target === "inbox") renderInbox();
+    if (target === "profile") renderProfilePage();
     if (target === "home") { renderProfile(); resetComposer(); }
     window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
   };
@@ -199,6 +200,26 @@
     $("#answersEmpty").hidden = list.length > 0;
   };
 
+  /* ---------- profile page ---------- */
+  const renderProfilePage = () => {
+    const all = storage.list();
+    const answered = all.filter(q => q.status === "answered").sort((a, b) => (b.answeredAt || 0) - (a.answeredAt || 0));
+    $("#pAvatar").textContent = (profile.name.trim()[0] || "?").toUpperCase();
+    $("#pName").textContent = profile.name;
+    $("#pHandle").textContent = profile.handle;
+    $("#pBio").textContent = profile.bio;
+    $("#pAnswered").textContent = answered.length;
+    $("#pReceived").textContent = all.length;
+    $("#pRate").textContent = all.length ? Math.round((answered.length / all.length) * 100) + "%" : "0%";
+    $("#pSince").textContent = answered.length ? `آخر إجابة ${timeAgo(answered[0].answeredAt || answered[0].createdAt)}` : "لا إجابات منشورة بعد";
+    $("#pEdit").hidden = !unlocked;
+    const feed = $("#profileFeed"); feed.replaceChildren();
+    answered.slice(0, 3).forEach((q, i) => { const c = makeCard(q, { owner: false }); c.style.animationDelay = `${i * 40}ms`; feed.appendChild(c); });
+    $("#profileEmpty").hidden = answered.length > 0;
+    $(".see-all").hidden = answered.length <= 3;
+  };
+  $("#pCopy").addEventListener("click", () => copy(`${location.origin}${location.pathname}#profile`, "تم نسخ رابط الملف الشخصي"));
+
   /* ---------- inbox ---------- */
   const remembered = () => { try { return localStorage.getItem(KEY_UNLOCK) === "1"; } catch { return false; } };
   let unlocked = sessionStorage.getItem(KEY_UNLOCK) === "1" || remembered();
@@ -259,9 +280,10 @@
   $("#authClose").addEventListener("click", (e) => { e.preventDefault(); continueAsGuest(); });
   $$(".auth-links [data-guest]").forEach(a => a.addEventListener("click", (e) => { e.preventDefault(); continueAsGuest(a.getAttribute("href").slice(1)); }));
   $("#authTheme").addEventListener("click", () => $("#themeToggle").click());
+  $("#footTheme").addEventListener("click", () => $("#themeToggle").click());
   $("#navSignIn").addEventListener("click", goSignIn);
   $("#lockSignIn").addEventListener("click", goSignIn);
-  $("#navUser").addEventListener("click", () => { location.hash = "#inbox"; });
+  $("#navUser").addEventListener("click", () => { location.hash = "#profile"; });
 
   /* ---------- sign-in slides ---------- */
   const slides = $$(".slide"), dots = $$("#slideDots .dot");
@@ -297,6 +319,7 @@
   };
   const closeSettings = () => { sheet.hidden = true; };
   $("#openSettings").addEventListener("click", openSettings);
+  $("#pEdit").addEventListener("click", openSettings);
   $("#closeSettings").addEventListener("click", closeSettings);
   sheet.addEventListener("click", (e) => { if (e.target === sheet) closeSettings(); });
   document.addEventListener("keydown", (e) => {
@@ -310,9 +333,9 @@
     if (handle && !handle.startsWith("@")) handle = "@" + handle;
     profile = { ...profile, name: $("#setName").value.trim() || profile.name, handle: handle || profile.handle, bio: $("#setBio").value.trim(), ...(pass ? { pass } : {}) };
     safe.set(KEY_P, profile);
-    toast("تم حفظ الإعدادات"); closeSettings(); renderProfile(); renderAuth(); renderInbox();
+    toast("تم حفظ الإعدادات"); closeSettings(); renderProfile(); renderAuth(); renderInbox(); renderProfilePage();
   });
-  $("#clearSamples").addEventListener("click", () => { storage.removeSamples(); toast("تم حذف الأسئلة التجريبية"); closeSettings(); renderInbox(); renderProfile(); });
+  $("#clearSamples").addEventListener("click", () => { storage.removeSamples(); toast("تم حذف الأسئلة التجريبية"); closeSettings(); renderInbox(); renderProfile(); renderProfilePage(); });
 
   /* ---------- boot ---------- */
   updateCounter();

@@ -3,80 +3,83 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>همس — أسئلة مجهولة</title>
-<meta name="description" content="اسألني أي شيء بدون أن يعرف أحد من أنت. أجيب عن أفضل الأسئلة علنًا.">
-<meta property="og:title" content="همس — أسئلة مجهولة">
+<title>Whisper</title>
+<meta name="description" content="اسألني أي شيء بدون أن يعرف أحد من أنت.">
+<meta property="og:title" content="Whisper">
 <meta property="og:description" content="أرسل لي سؤالًا مجهولًا. بلا اسم، بلا حساب، بلا أثر.">
-<meta name="theme-color" content="#0a0b14">
+<meta name="theme-color" content="#ffffff">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@600;700&display=swap" rel="stylesheet">
 <link rel="preload" href="fonts/thmanyahseriftext-Medium.otf" as="font" type="font/otf" crossorigin>
 <link rel="preload" href="fonts/thmanyahseriftext-Bold.otf" as="font" type="font/otf" crossorigin>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- الخلفية السائلة -->
 <div class="ambient" aria-hidden="true">
   <span class="blob blob-a"></span>
   <span class="blob blob-b"></span>
-  <span class="blob blob-c"></span>
-  <span class="grain"></span>
 </div>
 
-<!-- شريط التنقل الزجاجي -->
 <header class="topbar">
-  <nav class="nav glass" aria-label="الرئيسي">
+  <nav class="nav" aria-label="Main">
     <a class="brand" href="#home">
       <span class="brand-mark" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .8-1 1.5"/><circle cx="12" cy="16.6" r=".6" fill="currentColor"/></svg>
       </span>
-      <span class="brand-name">همس</span>
+      <span class="brand-name">Whisper</span>
     </a>
     <div class="nav-links" role="tablist">
-      <a href="#home" data-route="home" class="nav-link">اسأل</a>
-      <a href="#answers" data-route="answers" class="nav-link">الإجابات</a>
-      <a href="#inbox" data-route="inbox" class="nav-link">الوارد <span class="pill" id="inboxCount" hidden>0</span></a>
+      <a href="#home" data-route="home" class="nav-link">Ask</a>
+      <a href="#answers" data-route="answers" class="nav-link">Answers</a>
+      <a href="#inbox" data-route="inbox" class="nav-link">Inbox <span class="pill" id="inboxCount" hidden>0</span></a>
     </div>
-    <button class="btn-ghost sm" id="navSignIn" type="button">تسجيل الدخول</button>
-    <button class="user-chip" id="navUser" type="button" hidden title="الحساب">
-      <span class="user-avatar" id="navAvatar">ي</span>
-      <span class="user-name" id="navName">Yahya</span>
-    </button>
-    <button class="icon-btn" id="themeToggle" type="button" aria-label="تبديل المظهر" title="تبديل المظهر">
-      <svg class="ico-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-      <svg class="ico-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
-    </button>
+    <div class="nav-actions">
+      <button class="btn-primary sm" id="navSignIn" type="button">Sign in</button>
+      <button class="user-chip" id="navUser" type="button" hidden title="Account">
+        <span class="user-avatar" id="navAvatar">Y</span>
+        <span class="user-name" id="navName">Yahya</span>
+      </button>
+      <button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle theme" title="Theme">
+        <svg class="ico-sun" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="ico-moon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </div>
   </nav>
 </header>
 
 <main class="page">
 
-  <!-- ===================== الرئيسية / اسأل ===================== -->
+  <!-- ===================== Ask ===================== -->
   <section class="view" data-view="home">
     <div class="hero">
       <div class="avatar-ring">
-        <div class="avatar glass" id="avatar">ي</div>
-        <span class="status-dot" title="يستقبل الأسئلة"></span>
+        <div class="avatar" id="avatar">Y</div>
+        <span class="status-dot" title="Open for questions"></span>
       </div>
-      <h1 class="display" id="profileName">يحيى المعولي</h1>
-      <p class="handle" id="profileHandle">@Yahya</p>
-      <p class="bio" id="profileBio">اسألني أي شيء. أجيب عن الأسئلة الجميلة علنًا، والباقي يبقى بيننا.</p>
-      <div class="stats">
-        <div class="stat"><strong id="statAnswered">0</strong><span>إجابة</span></div>
-        <div class="stat"><strong id="statReceived">0</strong><span>سؤال وصل</span></div>
-        <div class="stat"><strong>100%</strong><span>مجهول</span></div>
+      <div class="hero-body">
+        <h1 class="display" id="profileName">Yahya Al Mawali</h1>
+        <p class="handle" id="profileHandle">@Yahya</p>
+        <p class="bio" id="profileBio">اسألني أي شيء. أجيب عن الأسئلة الجميلة علنًا، والباقي يبقى بيننا.</p>
+        <div class="stats">
+          <div class="stat"><strong id="statAnswered">0</strong><span>Answered</span></div>
+          <div class="stat"><strong id="statReceived">0</strong><span>Received</span></div>
+          <div class="stat"><strong>100%</strong><span>Anonymous</span></div>
+        </div>
       </div>
     </div>
 
     <div class="composer glass" id="composer">
       <div class="composer-head">
-        <span class="chip"><span class="dot"></span> مجهول الهوية</span>
-        <span class="chip ghost">بدون تسجيل</span>
+        <span class="chip"><span class="dot"></span> Anonymous</span>
+        <span class="chip ghost">No sign-in</span>
       </div>
       <form id="askForm" novalidate>
-        <label class="sr-only" for="question">سؤالك</label>
+        <label class="sr-only" for="question">Your question</label>
         <textarea id="question" name="question" rows="4" maxlength="300" placeholder="اكتب سؤالك… لن يعرف أحد أنه منك." required></textarea>
         <div class="composer-foot">
-          <div class="prompts" id="prompts" aria-label="اقتراحات">
+          <div class="prompts" id="prompts" aria-label="Suggestions">
             <button type="button" class="prompt">ما رأي تؤمن به ويخالفك فيه الناس؟</button>
             <button type="button" class="prompt">أفضل نصيحة تجاهلتها؟</button>
             <button type="button" class="prompt">أي أغنية تكررها هذه الأيام؟</button>
@@ -84,8 +87,8 @@
           <div class="send-row">
             <span class="counter" id="counter">0 / 300</span>
             <button class="btn-primary" id="sendBtn" type="submit">
-              <span class="btn-label">أرسل بشكل مجهول</span>
-              <svg class="flip-rtl" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>
+              <span class="btn-label">Send</span>
+              <svg class="flip-rtl" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>
             </button>
           </div>
         </div>
@@ -94,87 +97,88 @@
 
       <div class="sent" id="sentState" hidden>
         <div class="sent-check" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
         </div>
-        <h2>وصل. سرّك في أمان.</h2>
-        <p>إذا تمت الإجابة عنه سيظهر في صفحة <a href="#answers">الإجابات</a>.</p>
-        <button class="btn-ghost" id="sendAnother" type="button">أرسل سؤالًا آخر</button>
+        <h2>Sent</h2>
+        <p>وصل سؤالك وسرّك في أمان. إذا تمت الإجابة عنه سيظهر في <a href="#answers">Answers</a>.</p>
+        <button class="btn-ghost" id="sendAnother" type="button">Ask another</button>
       </div>
     </div>
 
     <p class="fineprint">لا نجمع أسماء ولا بريدًا ولا عناوين IP. كن لطيفًا، فالرسائل المسيئة تُحذف دون أن تُقرأ.</p>
   </section>
 
-  <!-- ===================== الإجابات ===================== -->
+  <!-- ===================== Answers ===================== -->
   <section class="view" data-view="answers" hidden>
     <div class="section-head">
-      <h1 class="display">الإجابات</h1>
+      <h1 class="display">Answers</h1>
       <p class="lede">أسئلة استحقت أن تُجاب بصوت عالٍ.</p>
     </div>
     <div class="feed" id="answersFeed"></div>
-    <div class="empty glass" id="answersEmpty" hidden>
-      <h3>لا إجابات بعد</h3>
+    <div class="empty" id="answersEmpty" hidden>
+      <h3>No answers yet</h3>
       <p>كن أول من <a href="#home">يسأل شيئًا</a>.</p>
     </div>
   </section>
 
-  <!-- ===================== الوارد ===================== -->
+  <!-- ===================== Inbox ===================== -->
   <section class="view" data-view="inbox" hidden>
 
     <div class="lock glass" id="lockScreen">
       <div class="lock-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="3"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="3"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
       </div>
-      <h2>صندوق المالك</h2>
+      <h2>Owner Inbox</h2>
       <p>سجّل الدخول لقراءة الأسئلة والإجابة عنها.</p>
-      <button class="btn-primary" id="lockSignIn" type="button"><span class="btn-label">تسجيل الدخول</span></button>
+      <button class="btn-primary" id="lockSignIn" type="button"><span class="btn-label">Sign in</span></button>
       <p class="hint">صاحب الصفحة وحده يستطيع فتح صندوق الوارد.</p>
     </div>
 
     <div id="inboxPanel" hidden>
-      <div class="section-head row">
-        <div>
-          <h1 class="display">الوارد</h1>
-          <p class="lede" id="inboxLede">لا أسئلة بانتظارك</p>
+      <div class="view-stack">
+        <div class="section-head row">
+          <div>
+            <h1 class="display">Inbox</h1>
+            <p class="lede" id="inboxLede">لا أسئلة بانتظارك</p>
+          </div>
+          <div class="head-actions">
+            <button class="btn-ghost" id="copyLink" type="button">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>
+              Copy link
+            </button>
+            <button class="btn-ghost" id="openSettings" type="button">Settings</button>
+            <button class="btn-ghost" id="lockBtn" type="button">Sign out</button>
+          </div>
         </div>
-        <div class="head-actions">
-          <button class="btn-ghost" id="copyLink" type="button">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>
-            نسخ رابطي
-          </button>
-          <button class="btn-ghost" id="openSettings" type="button">الإعدادات</button>
-          <button class="btn-ghost" id="lockBtn" type="button">تسجيل الخروج</button>
+
+        <div class="filters" role="tablist" aria-label="Filter">
+          <button class="filter is-active" data-filter="all" type="button">All</button>
+          <button class="filter" data-filter="open" type="button">Open</button>
+          <button class="filter" data-filter="answered" type="button">Answered</button>
+          <button class="filter" data-filter="archived" type="button">Archived</button>
+        </div>
+
+        <div class="feed" id="inboxFeed"></div>
+        <div class="empty" id="inboxEmpty" hidden>
+          <h3>Inbox zero</h3>
+          <p>شارك رابطك وستبدأ الأسئلة بالوصول.</p>
         </div>
       </div>
 
-      <div class="filters glass" role="tablist" aria-label="تصفية">
-        <button class="filter is-active" data-filter="all" type="button">الكل</button>
-        <button class="filter" data-filter="open" type="button">بلا إجابة</button>
-        <button class="filter" data-filter="answered" type="button">مُجاب</button>
-        <button class="filter" data-filter="archived" type="button">الأرشيف</button>
-      </div>
-
-      <div class="feed" id="inboxFeed"></div>
-      <div class="empty glass" id="inboxEmpty" hidden>
-        <h3>الصندوق فارغ</h3>
-        <p>شارك رابطك وستبدأ الأسئلة بالوصول.</p>
-      </div>
-
-      <!-- نافذة الإعدادات -->
       <div class="sheet-backdrop" id="settingsSheet" hidden>
         <div class="sheet glass" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
           <div class="sheet-head">
-            <h2 id="settingsTitle">الإعدادات</h2>
-            <button class="icon-btn" id="closeSettings" type="button" aria-label="إغلاق">✕</button>
+            <h2 id="settingsTitle">Settings</h2>
+            <button class="icon-btn" id="closeSettings" type="button" aria-label="Close">✕</button>
           </div>
           <form id="settingsForm" class="settings-form">
-            <label>الاسم الظاهر<input id="setName" type="text" maxlength="40" required></label>
-            <label>اسم المستخدم<input id="setHandle" type="text" maxlength="30" placeholder="@you" dir="ltr"></label>
-            <label>النبذة<textarea id="setBio" rows="3" maxlength="160"></textarea></label>
-            <label>رمز الدخول<input id="setPass" type="password" inputmode="numeric" minlength="4" maxlength="32" autocomplete="new-password" dir="ltr"></label>
+            <label>Display name<input id="setName" type="text" maxlength="40" required></label>
+            <label>Username<input id="setHandle" type="text" maxlength="30" placeholder="@you" dir="ltr"></label>
+            <label>Bio<textarea id="setBio" rows="3" maxlength="160"></textarea></label>
+            <label>Passcode<input id="setPass" type="password" inputmode="numeric" minlength="4" maxlength="32" autocomplete="new-password" placeholder="اتركه فارغًا لإبقائه كما هو" dir="ltr"></label>
             <div class="sheet-actions">
-              <button class="btn-danger" id="clearSamples" type="button">حذف الأسئلة التجريبية</button>
-              <button class="btn-primary" type="submit"><span class="btn-label">حفظ</span></button>
+              <button class="btn-danger" id="clearSamples" type="button">Remove samples</button>
+              <button class="btn-primary" type="submit"><span class="btn-label">Save</span></button>
             </div>
           </form>
         </div>
@@ -185,55 +189,54 @@
 </main>
 
 <footer class="foot">
-  <span>همس · أسئلة مجهولة</span>
+  <span>Whisper</span>
   <span class="sep">·</span>
-  <a href="#home">اسأل</a>
+  <a href="#home">Ask</a>
   <span class="sep">·</span>
-  <a href="#answers">الإجابات</a>
+  <a href="#answers">Answers</a>
 </footer>
 
-<!-- نافذة تسجيل الدخول عند فتح الموقع -->
 <div class="sheet-backdrop login-backdrop" id="loginSheet" hidden>
   <div class="sheet glass login" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
     <div class="login-brand" aria-hidden="true">
       <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .8-1 1.5"/><circle cx="12" cy="16.6" r=".6" fill="currentColor"/></svg>
     </div>
-    <h2 id="loginTitle" class="display">أهلًا بك في همس</h2>
+    <h2 id="loginTitle" class="display">Welcome to Whisper</h2>
     <p class="login-sub">سجّل الدخول لإدارة صندوقك، أو تابع كزائر لتسأل بشكل مجهول.</p>
     <form id="loginForm" class="login-form" novalidate>
-      <label>اسم المستخدم<input id="loginUser" type="text" autocomplete="username" placeholder="@Yahya" autocapitalize="off" spellcheck="false" dir="ltr"></label>
-      <label>رمز الدخول<input id="loginPass" type="password" autocomplete="current-password" inputmode="numeric" placeholder="••••" dir="ltr"></label>
+      <label>Username<input id="loginUser" type="text" autocomplete="username" placeholder="@Yahya" autocapitalize="off" spellcheck="false" dir="ltr"></label>
+      <label>Passcode<input id="loginPass" type="password" autocomplete="current-password" inputmode="numeric" placeholder="••••" dir="ltr"></label>
       <p class="form-error" id="loginError" role="alert" hidden></p>
-      <button class="btn-primary login-btn" type="submit"><span class="btn-label">تسجيل الدخول</span></button>
+      <button class="btn-primary login-btn" type="submit"><span class="btn-label">Sign in</span></button>
     </form>
-    <div class="divider"><span>أو</span></div>
-    <button class="btn-ghost login-guest" id="loginGuest" type="button">المتابعة كزائر</button>
+    <div class="divider"><span>or</span></div>
+    <button class="btn-ghost login-guest" id="loginGuest" type="button">Continue as guest</button>
     <p class="hint">الزوار يرسلون الأسئلة بدون حساب، ولا نحفظ عنك أي شيء.</p>
   </div>
 </div>
 
-<div class="toast glass" id="toast" role="status" aria-live="polite" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
 <template id="tplQuestion">
-  <article class="card glass q-card">
+  <article class="card q-card">
     <header class="q-head">
       <span class="q-avatar" aria-hidden="true">؟</span>
       <div class="q-meta">
-        <span class="q-from">مجهول</span>
+        <span class="q-from">Anonymous</span>
         <time class="q-time"></time>
       </div>
       <span class="badge"></span>
     </header>
     <p class="q-text"></p>
     <div class="q-answer" hidden>
-      <span class="a-label">الإجابة</span>
+      <span class="a-label">Answer</span>
       <p class="a-text"></p>
     </div>
     <div class="q-reply" hidden>
       <textarea class="reply-input" rows="3" maxlength="600" placeholder="اكتب إجابتك…"></textarea>
       <div class="q-actions">
-        <button class="btn-ghost act-cancel" type="button">إلغاء</button>
-        <button class="btn-primary act-publish" type="button"><span class="btn-label">نشر الإجابة</span></button>
+        <button class="btn-ghost act-cancel" type="button">Cancel</button>
+        <button class="btn-primary act-publish" type="button"><span class="btn-label">Publish</span></button>
       </div>
     </div>
     <footer class="q-foot">

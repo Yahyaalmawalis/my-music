@@ -48,7 +48,7 @@
   };
 
   let profile = Object.assign(
-    { name: "يحيى المعولي", handle: "@Yahya", bio: "اسألني أي شيء. أجيب عن الأسئلة الجميلة علنًا، والباقي يبقى بيننا.", pass: "1234" },
+    { name: "Yahya Al Mawali", handle: "@Yahya", bio: "اسألني أي شيء. أجيب عن الأسئلة الجميلة علنًا، والباقي يبقى بيننا.", pass: "1234" },
     safe.get(KEY_P, {})
   );
 
@@ -74,10 +74,10 @@
 
   /* ---------- theme ---------- */
   const root = document.documentElement;
-  const applyTheme = (t) => { if (t === "light") root.setAttribute("data-theme", "light"); else root.removeAttribute("data-theme"); };
-  applyTheme(safe.get(KEY_T, matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark"));
+  const applyTheme = (t) => { root.setAttribute("data-theme", t === "dark" ? "dark" : "light"); document.querySelector('meta[name="theme-color"]').content = t === "dark" ? "#0b0b0d" : "#ffffff"; };
+  applyTheme(safe.get(KEY_T, matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
   $("#themeToggle").addEventListener("click", () => {
-    const next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
+    const next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
     applyTheme(next); safe.set(KEY_T, next);
   });
 
@@ -149,8 +149,8 @@
     $(".q-time", node).dateTime = new Date(q.createdAt).toISOString();
     $(".q-text", node).textContent = q.text;
     const badge = $(".badge", node);
-    if (q.sample && owner) { badge.textContent = "تجريبي"; badge.classList.add("is-sample"); }
-    else if (owner) { badge.textContent = { open: "جديد", answered: "مُجاب", archived: "مؤرشف" }[q.status]; badge.classList.add(`is-${q.status}`); }
+    if (q.sample && owner) { badge.textContent = "Sample"; badge.classList.add("is-sample"); }
+    else if (owner) { badge.textContent = { open: "New", answered: "Answered", archived: "Archived" }[q.status]; badge.classList.add(`is-${q.status}`); }
     else badge.remove();
 
     if (q.answer) { $(".q-answer", node).hidden = false; $(".a-text", node).textContent = q.answer; }
@@ -160,7 +160,7 @@
 
     if (!owner) {
       node.classList.add("answers-card");
-      btn("مشاركة", "", () => copy(`س: ${q.text}\nج: ${q.answer}\n${location.origin}${location.pathname}#answers`, "تم النسخ"));
+      btn("Share", "accent", () => copy(`س: ${q.text}\nج: ${q.answer}\n${location.origin}${location.pathname}#answers`, "تم النسخ"));
       return node;
     }
 
@@ -174,13 +174,13 @@
       toast("تم نشر الإجابة"); renderInbox();
     });
 
-    if (q.status === "open") btn("إجابة", "", openReply);
-    if (q.status === "answered") btn("تعديل الإجابة", "", openReply);
-    if (q.status !== "archived") btn("أرشفة", "", () => { storage.update(q.id, { status: "archived" }); renderInbox(); });
-    else btn("استعادة", "", () => { storage.update(q.id, { status: q.answer ? "answered" : "open" }); renderInbox(); });
-    btn("نسخ", "", () => copy(q.text, "تم نسخ السؤال"));
-    const del = btn("حذف", "", () => {
-      if (!del.classList.contains("is-confirm")) { del.classList.add("is-confirm"); del.textContent = "تأكيد الحذف؟"; setTimeout(() => { del.classList.remove("is-confirm"); del.textContent = "حذف"; }, 2500); return; }
+    if (q.status === "open") btn("Answer", "accent", openReply);
+    if (q.status === "answered") btn("Edit", "accent", openReply);
+    if (q.status !== "archived") btn("Archive", "", () => { storage.update(q.id, { status: "archived" }); renderInbox(); });
+    else btn("Restore", "", () => { storage.update(q.id, { status: q.answer ? "answered" : "open" }); renderInbox(); });
+    btn("Copy", "", () => copy(q.text, "تم نسخ السؤال"));
+    const del = btn("Delete", "", () => {
+      if (!del.classList.contains("is-confirm")) { del.classList.add("is-confirm"); del.textContent = "Delete?"; setTimeout(() => { del.classList.remove("is-confirm"); del.textContent = "Delete"; }, 2500); return; }
       storage.remove(q.id); toast("تم الحذف"); renderInbox();
     });
     return node;
@@ -230,7 +230,7 @@
     if (!u || !p) { $("#loginError").textContent = "أدخل اسم المستخدم ورمز الدخول."; $("#loginError").hidden = false; return; }
     if (!nameMatch || p !== profile.pass) { $("#loginError").textContent = "اسم المستخدم أو رمز الدخول غير صحيح."; $("#loginError").hidden = false; $("#loginPass").select(); return; }
     unlocked = true; sessionStorage.setItem(KEY_UNLOCK, "1"); sessionStorage.removeItem(KEY_GUEST);
-    closeLogin(); renderAuth(); toast(`أهلًا بعودتك، ${profile.name.split(" ")[0]}`);
+    closeLogin(); renderAuth(); toast(`Welcome back, ${profile.name.split(" ")[0]}`);
     location.hash = "#inbox"; renderInbox();
   });
   $("#loginGuest").addEventListener("click", () => { sessionStorage.setItem(KEY_GUEST, "1"); closeLogin(); ta.focus(); });

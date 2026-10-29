@@ -12,6 +12,7 @@
   const KEY_P = "whisper.profile.v1";
   const KEY_T = "whisper.theme";
   const KEY_UNLOCK = "whisper.unlocked";
+  const KEY_GUEST = "whisper.guest";
 
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -47,7 +48,7 @@
   };
 
   let profile = Object.assign(
-    { name: "Alex", handle: "@alex", bio: "Ask me anything. I answer the good ones in public, the rest stay between us.", pass: "1234" },
+    { name: "Yahya Al Mawali", handle: "@Yahya", bio: "Ask me anything. I answer the good ones in public, the rest stay between us.", pass: "1234" },
     safe.get(KEY_P, {})
   );
 
@@ -198,7 +199,7 @@
   let filter = "all";
   const renderInbox = () => {
     $("#lockScreen").hidden = unlocked; $("#inboxPanel").hidden = !unlocked;
-    if (!unlocked) { setTimeout(() => $("#passcode").focus(), 50); return; }
+    if (!unlocked) return;
     const all = storage.list();
     const open = all.filter(q => q.status === "open").length;
     $("#inboxLede").textContent = open === 0 ? "Nothing waiting — nice." : `${open} question${open === 1 ? "" : "s"} waiting`;
@@ -208,13 +209,40 @@
     $("#inboxEmpty").hidden = list.length > 0;
     updateInboxCount();
   };
-  $("#unlockForm").addEventListener("submit", (e) => {
+  /* ---------- sign-in sheet ---------- */
+  const loginSheet = $("#loginSheet");
+  const normHandle = (h) => h.trim().replace(/^@/, "").toLowerCase();
+  const renderAuth = () => {
+    $("#navSignIn").hidden = unlocked; $("#navUser").hidden = !unlocked;
+    $("#navAvatar").textContent = (profile.name.trim()[0] || "?").toUpperCase();
+    $("#navName").textContent = profile.handle.replace(/^@/, "");
+  };
+  const openLogin = () => {
+    $("#loginError").hidden = true; $("#loginPass").value = "";
+    $("#loginUser").placeholder = profile.handle;
+    loginSheet.hidden = false; setTimeout(() => $("#loginUser").focus(), 50);
+  };
+  const closeLogin = () => { loginSheet.hidden = true; };
+  $("#loginForm").addEventListener("submit", (e) => {
     e.preventDefault();
-    const v = $("#passcode").value;
-    if (v === profile.pass) { unlocked = true; sessionStorage.setItem(KEY_UNLOCK, "1"); $("#passcode").value = ""; $("#unlockError").hidden = true; renderInbox(); }
-    else { $("#unlockError").textContent = "That passcode doesn't match."; $("#unlockError").hidden = false; $("#passcode").select(); }
+    const u = normHandle($("#loginUser").value), p = $("#loginPass").value;
+    const nameMatch = u === normHandle(profile.handle) || u === profile.name.trim().toLowerCase();
+    if (!u || !p) { $("#loginError").textContent = "Enter your username and passcode."; $("#loginError").hidden = false; return; }
+    if (!nameMatch || p !== profile.pass) { $("#loginError").textContent = "Username or passcode doesn't match."; $("#loginError").hidden = false; $("#loginPass").select(); return; }
+    unlocked = true; sessionStorage.setItem(KEY_UNLOCK, "1"); sessionStorage.removeItem(KEY_GUEST);
+    closeLogin(); renderAuth(); toast(`Welcome back, ${profile.name.split(" ")[0]}`);
+    location.hash = "#inbox"; renderInbox();
   });
-  $("#lockBtn").addEventListener("click", () => { unlocked = false; sessionStorage.removeItem(KEY_UNLOCK); renderInbox(); });
+  $("#loginGuest").addEventListener("click", () => { sessionStorage.setItem(KEY_GUEST, "1"); closeLogin(); ta.focus(); });
+  $("#navSignIn").addEventListener("click", openLogin);
+  $("#lockSignIn").addEventListener("click", openLogin);
+  $("#navUser").addEventListener("click", () => { location.hash = "#inbox"; });
+  loginSheet.addEventListener("click", (e) => { if (e.target === loginSheet) { sessionStorage.setItem(KEY_GUEST, "1"); closeLogin(); } });
+
+  $("#lockBtn").addEventListener("click", () => {
+    unlocked = false; sessionStorage.removeItem(KEY_UNLOCK); sessionStorage.setItem(KEY_GUEST, "1");
+    renderAuth(); toast("Signed out"); location.hash = "#home"; renderInbox();
+  });
   $$(".filter").forEach(b => b.addEventListener("click", () => {
     filter = b.dataset.filter; $$(".filter").forEach(x => x.classList.toggle("is-active", x === b)); renderInbox();
   }));
@@ -231,7 +259,11 @@
   $("#openSettings").addEventListener("click", openSettings);
   $("#closeSettings").addEventListener("click", closeSettings);
   sheet.addEventListener("click", (e) => { if (e.target === sheet) closeSettings(); });
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !sheet.hidden) closeSettings(); });
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    if (!sheet.hidden) closeSettings();
+    if (!loginSheet.hidden) { sessionStorage.setItem(KEY_GUEST, "1"); closeLogin(); }
+  });
   $("#settingsForm").addEventListener("submit", (e) => {
     e.preventDefault();
     const pass = $("#setPass").value.trim();
@@ -239,12 +271,14 @@
     if (handle && !handle.startsWith("@")) handle = "@" + handle;
     profile = { ...profile, name: $("#setName").value.trim() || profile.name, handle: handle || profile.handle, bio: $("#setBio").value.trim(), ...(pass ? { pass } : {}) };
     safe.set(KEY_P, profile);
-    toast("Settings saved"); closeSettings(); renderProfile(); renderInbox();
+    toast("Settings saved"); closeSettings(); renderProfile(); renderAuth(); renderInbox();
   });
   $("#clearSamples").addEventListener("click", () => { storage.removeSamples(); toast("Sample questions removed"); closeSettings(); renderInbox(); renderProfile(); });
 
   /* ---------- boot ---------- */
   updateCounter();
   renderProfile();
+  renderAuth();
   route();
+  if (!unlocked && sessionStorage.getItem(KEY_GUEST) !== "1") openLogin();
 })();

@@ -171,8 +171,8 @@
     catch { window.prompt("انسخ هذا النص:", text); }
   };
 
-  /* the link people share: opens the Ask page straight away, no sign-in */
-  const shareLink = () => `${location.origin}${location.pathname}#ask`;
+  /* the link people share (NGL-style): a standalone page at /yahya/ that only asks */
+  const shareLink = () => new URL("../yahya/", location.href).href;
 
   /* ---------- theme ---------- */
   const root = document.documentElement;
@@ -493,7 +493,7 @@
   });
   $("#clearSamples").addEventListener("click", () => { store.removeSamples(); toast("تم حذف الأسئلة التجريبية"); closeSettings(); rerender(); });
 
-  $("#shareUrl").textContent = shareLink().replace(/^https?:\/\//, "");
+  $("#shareUrl").textContent = shareLink().replace(/^https?:\/\//, "").replace(/\/$/, "");
 
   /* ---------- remote-mode labels ---------- */
   if (remote) {

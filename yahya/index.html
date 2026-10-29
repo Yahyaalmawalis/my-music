@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ask Yahya</title>
+<meta name="description" content="أرسل لي سؤالًا مجهولًا. لن أعرف من أنت.">
+<meta property="og:title" content="Ask Yahya anything">
+<meta property="og:description" content="أرسل لي سؤالًا مجهولًا. لن أعرف من أنت.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#0011ff">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@700&display=swap" rel="stylesheet">
+<style>
+/* Ask link page — one job: send Yahya an anonymous question.
+   Layout after NGL: a single card on a full-bleed electric-blue field,
+   header strip with avatar + handle, the textarea inside the same card,
+   one big Send button under it. Liquid-glass card over drifting light. */
+@font-face { font-family: "Thmanyah Serif Text"; src: url("../ask/fonts/thmanyahseriftext-Medium.otf") format("opentype"); font-weight: 400 500; font-display: swap; }
+@font-face { font-family: "Thmanyah Serif Text"; src: url("../ask/fonts/thmanyahseriftext-Bold.otf") format("opentype"); font-weight: 600 800; font-display: swap; }
+
+:root {
+  --field-a: #0011ff;
+  --field-b: #4d6bff;
+  --ink: #0a0a0a;
+  --paper: #ffffff;
+  --muted: rgba(255, 255, 255, 0.78);
+  --card-glass: rgba(255, 255, 255, 0.22);
+  --card-line: rgba(255, 255, 255, 0.5);
+  --head-bg: rgba(255, 255, 255, 0.92);
+  --head-ink: #0a0a0a;
+  --head-sub: #4b4b55;
+  --body-bg: rgba(255, 255, 255, 0.72);
+  --body-ink: #0a0a0a;
+  --placeholder: #8a8a95;
+  --danger: #ffe1e6;
+  --font-ui: "IBM Plex Sans", "Thmanyah Serif Text", "Geeza Pro", system-ui, sans-serif;
+  --font-display: "IBM Plex Serif", "Thmanyah Serif Text", Georgia, serif;
+  --font-ar: "Thmanyah Serif Text", "Geeza Pro", "Noto Naskh Arabic", serif;
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --field-a: #0b0f5c;
+  --field-b: #1f2ad1;
+  --head-bg: rgba(16, 17, 24, 0.86);
+  --head-ink: #f5f5f5;
+  --head-sub: #b4b4c0;
+  --body-bg: rgba(16, 17, 24, 0.62);
+  --body-ink: #f5f5f5;
+  --placeholder: #8b8ba0;
+  --card-glass: rgba(255, 255, 255, 0.10);
+  --card-line: rgba(255, 255, 255, 0.22);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body {
+  font-family: var(--font-ui);
+  color: var(--paper);
+  background:
+    radial-gradient(60% 45% at 85% 5%, rgba(255,255,255,0.28), transparent 70%),
+    radial-gradient(70% 50% at 0% 100%, rgba(120, 200, 255, 0.5), transparent 70%),
+    linear-gradient(165deg, var(--field-b), var(--field-a));
+  background-attachment: fixed;
+  min-height: 100vh; min-height: 100dvh;
+  display: flex; flex-direction: column; align-items: center;
+  padding-block: 40px 28px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+[hidden] { display: none !important; }
+.blob { position: fixed; border-radius: 50%; filter: blur(60px); pointer-events: none; z-index: 0; }
+.blob.a { width: 320px; height: 320px; top: 12%; inset-inline-start: -80px; background: rgba(255, 122, 217, 0.45); animation: drift 18s ease-in-out infinite alternate; }
+.blob.b { width: 300px; height: 300px; bottom: 6%; inset-inline-end: -90px; background: rgba(94, 231, 255, 0.45); animation: drift 22s ease-in-out infinite alternate-reverse; }
+@keyframes drift { to { transform: translate(60px, -40px) scale(1.1); } }
+
+.wrap { position: relative; z-index: 1; width: min(100%, 460px); display: flex; flex-direction: column; gap: 16px; }
+
+/* ---------- the card ---------- */
+.card {
+  border-radius: 28px; overflow: hidden;
+  background: var(--card-glass);
+  -webkit-backdrop-filter: blur(26px) saturate(170%); backdrop-filter: blur(26px) saturate(170%);
+  border: 1px solid var(--card-line);
+  box-shadow: 0 30px 60px rgba(0, 6, 90, 0.35), inset 0 1px 0 rgba(255,255,255,0.6);
+}
+.card-head { display: flex; align-items: center; gap: 12px; padding: 16px 18px; background: var(--head-bg); color: var(--head-ink); }
+.avatar {
+  width: 48px; height: 48px; border-radius: 50%; flex: none; display: grid; place-items: center;
+  font-family: var(--font-display); font-weight: 700; font-size: 21px; color: #fff;
+  background: linear-gradient(135deg, #0011ff, #6a7bff);
+  box-shadow: 0 0 0 3px rgba(0, 17, 255, 0.15);
+}
+.who { display: flex; flex-direction: column; min-width: 0; line-height: 1.3; }
+.handle { font-weight: 700; font-size: 16px; direction: ltr; unicode-bidi: isolate; text-align: start; }
+.prompt-line { font-size: 15px; font-weight: 600; color: var(--head-sub); }
+.card-body { position: relative; background: var(--body-bg); }
+textarea {
+  display: block; width: 100%; min-height: 168px; resize: none; border: 0; outline: none;
+  background: transparent; color: var(--body-ink);
+  padding: 18px 18px 52px; font-family: var(--font-ar); font-size: 21px; line-height: 1.75;
+}
+textarea::placeholder { color: var(--placeholder); }
+.dice {
+  position: absolute; bottom: 12px; inset-inline-end: 12px;
+  width: 40px; height: 40px; border-radius: 50%; border: 0; display: grid; place-items: center; cursor: pointer;
+  background: rgba(0, 17, 255, 0.10); color: #0011ff; transition: transform .25s;
+}
+:root[data-theme="dark"] .dice { background: rgba(255,255,255,0.12); color: #fff; }
+.dice:hover { transform: rotate(25deg) scale(1.06); }
+.dice:focus-visible, .send:focus-visible, .ghost:focus-visible, textarea:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.count { position: absolute; bottom: 22px; right: 18px; font-size: 12px; color: var(--placeholder); direction: ltr; font-variant-numeric: tabular-nums; }
+
+.anon { display: flex; align-items: center; justify-content: center; gap: 7px; font-size: 14px; font-weight: 600; color: var(--muted); }
+
+.send {
+  width: 100%; border: 0; cursor: pointer; border-radius: 999px; padding: 17px 20px;
+  background: var(--ink); color: #fff; font-family: var(--font-ui); font-size: 18px; font-weight: 700;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.3); transition: transform .15s, opacity .2s;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+:root[data-theme="dark"] .send { background: #fff; color: #0a0a0a; }
+.send:hover { transform: translateY(-1px); }
+.send:active { transform: scale(0.98); }
+.send:disabled { opacity: .6; cursor: wait; }
+.err { margin: 0; text-align: center; font-family: var(--font-ar); font-size: 15px; color: var(--danger); }
+
+.ghost {
+  display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+  padding: 14px 18px; border-radius: 999px; text-decoration: none; cursor: pointer;
+  color: #fff; font-family: var(--font-ui); font-size: 16px; font-weight: 600;
+  background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.45);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); transition: background .2s;
+}
+.ghost:hover { background: rgba(255,255,255,0.24); }
+.pulse { animation: pulse 2.4s ease-in-out infinite; }
+@keyframes pulse { 50% { transform: scale(1.025); } }
+
+/* ---------- sent state ---------- */
+.sent { text-align: center; padding: 38px 22px 30px; background: var(--body-bg); color: var(--body-ink); display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.check { width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; background: #0011ff; color: #fff; margin-bottom: 6px; animation: pop .45s cubic-bezier(.2,.9,.2,1.25) both; }
+@keyframes pop { from { transform: scale(.6); opacity: 0; } }
+.sent h1 { margin: 0; font-family: var(--font-display); font-size: 34px; }
+.sent p { margin: 0; font-family: var(--font-ar); font-size: 18px; color: var(--head-sub); }
+
+.foot { margin-top: auto; padding-top: 26px; position: relative; z-index: 1; display: flex; gap: 16px; font-size: 13px; }
+.foot a, .foot button { color: var(--muted); text-decoration: none; background: none; border: 0; font: inherit; cursor: pointer; padding: 0; }
+.foot a:hover, .foot button:hover { color: #fff; }
+
+@media (max-width: 420px) {
+  body { padding-block: 24px 20px; }
+  textarea { font-size: 19px; min-height: 150px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<span class="blob a" aria-hidden="true"></span>
+<span class="blob b" aria-hidden="true"></span>
+
+<main class="wrap">
+  <form class="card" id="askForm" novalidate>
+    <div class="card-head">
+      <div class="avatar" id="avatar" aria-hidden="true">Y</div>
+      <div class="who">
+        <span class="handle" id="handle">@Yahya</span>
+        <span class="prompt-line"><bdi>Send me anonymous questions!</bdi></span>
+      </div>
+    </div>
+    <div class="card-body" id="askBody">
+      <label for="question" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Your question</label>
+      <textarea id="question" maxlength="300" placeholder="اكتب سؤالك هنا…" autocomplete="off"></textarea>
+      <span class="count" id="count">0/300</span>
+      <button class="dice" id="dice" type="button" aria-label="Random question" title="Random question">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg>
+      </button>
+    </div>
+    <div class="sent" id="sent" hidden>
+      <div class="check" aria-hidden="true"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+      <h1 dir="ltr">Sent!</h1>
+      <p>وصل سؤالك، ولن يعرف أحد أنه منك.</p>
+    </div>
+  </form>
+
+  <div id="askActions" class="wrap" style="width:100%">
+    <p class="anon">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="3"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+      Anonymous Q&amp;A
+    </p>
+    <p class="err" id="err" role="alert" hidden></p>
+    <button class="send" id="send" type="submit" form="askForm" dir="ltr">Send!</button>
+  </div>
+
+  <div id="sentActions" class="wrap" style="width:100%" hidden>
+    <button class="send" id="again" type="button" dir="ltr">Send another</button>
+  </div>
+
+  <a class="ghost pulse" id="answersLink" href="../ask/#answers">
+    See my answers
+    <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+  </a>
+</main>
+
+<footer class="foot">
+  <a href="../ask/#ask">Whisper</a>
+  <a href="../ask/#profile">Profile</a>
+  <button type="button" id="theme">Theme</button>
+</footer>
+
+<script src="../ask/config.js"></script>
+<script>
+(() => {
+  "use strict";
+  const $ = (s) => document.querySelector(s);
+  const KEY_Q = "whisper.questions.v1", KEY_P = "whisper.profile.v1", KEY_T = "whisper.theme";
+  const CFG = window.WHISPER_CONFIG || {};
+  const remote = Boolean(CFG.supabaseUrl && CFG.supabaseKey);
+  const get = (k, f) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : f; } catch { return f; } };
+  const set = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+
+  /* theme follows the main site */
+  const root = document.documentElement;
+  const apply = (t) => root.setAttribute("data-theme", t === "dark" ? "dark" : "light");
+  apply(get(KEY_T, matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
+  $("#theme").addEventListener("click", () => { const n = root.getAttribute("data-theme") === "dark" ? "light" : "dark"; apply(n); set(KEY_T, n); });
+
+  /* profile header */
+  const showProfile = (p) => {
+    if (!p) return;
+    if (p.handle) $("#handle").textContent = p.handle.startsWith("@") ? p.handle : "@" + p.handle;
+    if (p.name) { $("#avatar").textContent = p.name.trim()[0].toUpperCase(); document.title = "Ask " + p.name.split(" ")[0]; }
+  };
+  if (!remote) showProfile(get(KEY_P, null));
+
+  /* Supabase client, only when the site is connected */
+  let sb = null;
+  const ready = !remote ? Promise.resolve() : new Promise((res, rej) => {
+    const s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js";
+    s.onload = res; s.onerror = rej; document.head.appendChild(s);
+  }).then(async () => {
+    sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey, { auth: { persistSession: false } });
+    const { data } = await sb.from("profile").select("name,handle").eq("id", 1).maybeSingle();
+    showProfile(data);
+  }).catch((e) => console.error(e));
+
+  /* composer */
+  const ta = $("#question"), count = $("#count"), err = $("#err"), send = $("#send");
+  const update = () => { count.textContent = `${ta.value.length}/300`; err.hidden = true; };
+  ta.addEventListener("input", update);
+  const IDEAS = [
+    "ما رأي تؤمن به ويخالفك فيه الناس؟", "أفضل نصيحة تجاهلتها؟", "أي أغنية تكررها هذه الأيام؟",
+    "ما الشيء الذي تتمنى لو تعلمته أبكر؟", "لو تقدر تعيش في أي مدينة، أيها تختار؟", "ما آخر شيء أضحكك فعلًا؟",
+    "ما المشروع الذي تحلم أن تبدأه؟", "ما الكتاب الذي غيّر طريقة تفكيرك؟", "ما أكثر عادة صباحية تحبها؟",
+    "لو رجعت عشر سنوات للوراء، ماذا تقول لنفسك؟",
+  ];
+  let lastIdea = -1;
+  $("#dice").addEventListener("click", () => {
+    let i; do { i = Math.floor(Math.random() * IDEAS.length); } while (i === lastIdea && IDEAS.length > 1);
+    lastIdea = i; ta.value = IDEAS[i]; update(); ta.focus();
+  });
+
+  const save = async (text) => {
+    if (remote) {
+      await ready;
+      if (!sb) throw new Error("Not connected");
+      const { error } = await sb.from("questions").insert({ text });
+      if (error) throw error;
+      return;
+    }
+    const qs = get(KEY_Q, null);
+    const list = Array.isArray(qs) ? qs : [];
+    const id = crypto.randomUUID ? crypto.randomUUID() : "q" + Date.now().toString(36);
+    list.unshift({ id, text, status: "open", createdAt: Date.now() });
+    set(KEY_Q, list);
+  };
+
+  let lastSent = 0;
+  $("#askForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const text = ta.value.trim();
+    if (text.length < 3) { err.textContent = "اكتب سؤالك أولًا."; err.hidden = false; ta.focus(); return; }
+    if (Date.now() - lastSent < 4000) { err.textContent = "على مهلك، انتظر بضع ثوانٍ."; err.hidden = false; return; }
+    send.disabled = true; send.textContent = "Sending…";
+    try {
+      await save(text);
+      lastSent = Date.now();
+      ta.value = ""; update();
+      $("#askBody").hidden = true; $("#sent").hidden = false;
+      $("#askActions").hidden = true; $("#sentActions").hidden = false;
+    } catch (error) {
+      console.error(error);
+      err.textContent = "لم يُرسل سؤالك. تحقق من اتصالك وحاول مرة أخرى."; err.hidden = false;
+    } finally { send.disabled = false; send.textContent = "Send!"; }
+  });
+  $("#again").addEventListener("click", () => {
+    $("#askBody").hidden = false; $("#sent").hidden = true;
+    $("#askActions").hidden = false; $("#sentActions").hidden = true; ta.focus();
+  });
+})();
+</script>
+</body>
+</html>

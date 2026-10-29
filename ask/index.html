@@ -196,24 +196,123 @@
   <a href="#answers">Answers</a>
 </footer>
 
-<div class="sheet-backdrop login-backdrop" id="loginSheet" hidden>
-  <div class="sheet glass login" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
-    <div class="login-brand" aria-hidden="true">
-      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .8-1 1.5"/><circle cx="12" cy="16.6" r=".6" fill="currentColor"/></svg>
+<!-- ===================== Sign in page ===================== -->
+<section class="view auth" data-view="signin" hidden aria-labelledby="authTitle">
+  <a class="auth-close" href="#home" id="authClose" aria-label="Close and continue as guest" title="Close">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  </a>
+
+  <div class="auth-form-side">
+    <div class="auth-form-wrap">
+      <a class="auth-brand" href="#home" aria-label="Whisper home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .8-1 1.5"/><circle cx="12" cy="16.6" r=".6" fill="currentColor"/></svg>
+        </span>
+        <span class="brand-name">Whisper</span>
+      </a>
+
+      <h1 class="display auth-title" id="authTitle">Welcome back</h1>
+      <p class="auth-sub">سجّل الدخول لقراءة أسئلتك والإجابة عنها.</p>
+
+      <form id="loginForm" class="auth-form" novalidate>
+        <label class="field">
+          <span class="field-label">Username</span>
+          <input id="loginUser" type="text" autocomplete="username" placeholder="@Yahya" autocapitalize="off" spellcheck="false" dir="ltr">
+        </label>
+        <label class="field">
+          <span class="field-label">Passcode</span>
+          <span class="pass-wrap">
+            <input id="loginPass" type="password" autocomplete="current-password" inputmode="numeric" placeholder="••••" dir="ltr">
+            <button class="pass-toggle" id="passToggle" type="button" aria-label="Show passcode" aria-pressed="false">
+              <svg class="ico-eye" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="ico-eye-off" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M10.6 5.1A10.4 10.4 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.6A17 17 0 0 0 2 12s3.6 7 10 7a9.8 9.8 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+            </button>
+          </span>
+        </label>
+        <div class="auth-row">
+          <label class="check"><input id="loginRemember" type="checkbox"> <span>Remember me</span></label>
+          <span class="auth-hint">الرمز الافتراضي <code>1234</code></span>
+        </div>
+        <p class="form-error" id="loginError" role="alert" hidden></p>
+        <button class="btn-primary auth-btn" type="submit"><span class="btn-label">Sign in</span></button>
+      </form>
+
+      <div class="divider"><span>or</span></div>
+      <button class="btn-ghost auth-guest" id="loginGuest" type="button">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+        Continue as guest
+      </button>
+      <p class="auth-note">الزوار يرسلون الأسئلة بدون حساب، ولا نحفظ عنك أي شيء.</p>
+
+      <nav class="auth-links" aria-label="More">
+        <a href="#home" data-guest>Ask</a>
+        <a href="#answers" data-guest>Answers</a>
+        <button type="button" class="link-btn" id="authTheme">Theme</button>
+      </nav>
     </div>
-    <h2 id="loginTitle" class="display">Welcome to Whisper</h2>
-    <p class="login-sub">سجّل الدخول لإدارة صندوقك، أو تابع كزائر لتسأل بشكل مجهول.</p>
-    <form id="loginForm" class="login-form" novalidate>
-      <label>Username<input id="loginUser" type="text" autocomplete="username" placeholder="@Yahya" autocapitalize="off" spellcheck="false" dir="ltr"></label>
-      <label>Passcode<input id="loginPass" type="password" autocomplete="current-password" inputmode="numeric" placeholder="••••" dir="ltr"></label>
-      <p class="form-error" id="loginError" role="alert" hidden></p>
-      <button class="btn-primary login-btn" type="submit"><span class="btn-label">Sign in</span></button>
-    </form>
-    <div class="divider"><span>or</span></div>
-    <button class="btn-ghost login-guest" id="loginGuest" type="button">Continue as guest</button>
-    <p class="hint">الزوار يرسلون الأسئلة بدون حساب، ولا نحفظ عنك أي شيء.</p>
   </div>
-</div>
+
+  <aside class="auth-art" aria-label="About Whisper">
+    <div class="auth-art-inner">
+      <div class="slides" id="slides">
+        <article class="slide is-active">
+          <h2 class="slide-title">Ask anything</h2>
+          <p class="slide-sub">اسأل بحرية، لا أحد يعرف من أنت.</p>
+          <div class="mock">
+            <div class="mock-card glass-on-blue">
+              <span class="mock-from">Anonymous · <span class="ar">الآن</span></span>
+              <p class="ar">ما العادة الوحيدة التي غيّرت حياتك أكثر مما توقعت؟</p>
+            </div>
+            <div class="mock-card glass-on-blue small offset">
+              <span class="mock-from">Anonymous · <span class="ar">قبل 3 د</span></span>
+              <p class="ar">أي أغنية تكررها هذه الأيام؟</p>
+            </div>
+          </div>
+        </article>
+        <article class="slide">
+          <h2 class="slide-title">Stay anonymous</h2>
+          <p class="slide-sub">بلا اسم، بلا بريد، بلا عنوان IP.</p>
+          <div class="mock">
+            <div class="mock-card glass-on-blue mock-center">
+              <span class="mock-lock" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="3"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+              </span>
+              <p class="ar">سؤالك يصل، وهويتك تبقى عندك.</p>
+              <span class="mock-chip" dir="ltr">100% Anonymous</span>
+            </div>
+          </div>
+        </article>
+        <article class="slide">
+          <h2 class="slide-title">Answer in public</h2>
+          <p class="slide-sub">اختر الأسئلة الجميلة وأجب عنها أمام الجميع.</p>
+          <div class="mock">
+            <div class="mock-card glass-on-blue">
+              <span class="mock-from">Anonymous</span>
+              <p class="ar">بصراحة: هل تقرأ فعلًا كل سؤال يصلك؟</p>
+              <div class="mock-answer">
+                <span class="mock-label">Answer</span>
+                <p class="ar">كل واحد منها، غالبًا في الليل مع كوب شاي.</p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+      <div class="slide-nav">
+        <button class="slide-arrow" id="slidePrev" type="button" aria-label="Previous slide">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+        <div class="slide-dots" id="slideDots" role="tablist" aria-label="Slides">
+          <button type="button" class="dot is-active" aria-label="Slide 1"></button>
+          <button type="button" class="dot" aria-label="Slide 2"></button>
+          <button type="button" class="dot" aria-label="Slide 3"></button>
+        </div>
+        <button class="slide-arrow" id="slideNext" type="button" aria-label="Next slide">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+</section>
 
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 

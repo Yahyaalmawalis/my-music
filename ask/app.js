@@ -83,11 +83,16 @@
 
   /* ---------- routing ---------- */
   const views = $$(".view");
+  let afterSignIn = "home";            // where a guest lands after leaving the sign-in page
   const route = () => {
     const name = (location.hash.replace("#", "") || "home").split("?")[0];
-    const target = views.some(v => v.dataset.view === name) ? name : "home";
+    let target = views.some(v => v.dataset.view === name) ? name : "home";
+    if (target === "signin" && unlocked) { history.replaceState(null, "", "#inbox"); target = "inbox"; }
     views.forEach(v => { v.hidden = v.dataset.view !== target; });
+    document.body.classList.toggle("is-auth", target === "signin");
     $$(".nav-link").forEach(a => a.classList.toggle("is-active", a.dataset.route === target));
+    if (target === "signin") showSignIn();
+    else stopSlides();
     if (target === "answers") renderAnswers();
     if (target === "inbox") renderInbox();
     if (target === "home") { renderProfile(); resetComposer(); }
@@ -195,7 +200,8 @@
   };
 
   /* ---------- inbox ---------- */
-  let unlocked = sessionStorage.getItem(KEY_UNLOCK) === "1";
+  const remembered = () => { try { return localStorage.getItem(KEY_UNLOCK) === "1"; } catch { return false; } };
+  let unlocked = sessionStorage.getItem(KEY_UNLOCK) === "1" || remembered();
   let filter = "all";
   const renderInbox = () => {
     $("#lockScreen").hidden = unlocked; $("#inboxPanel").hidden = !unlocked;
@@ -209,38 +215,72 @@
     $("#inboxEmpty").hidden = list.length > 0;
     updateInboxCount();
   };
-  /* ---------- sign-in sheet ---------- */
-  const loginSheet = $("#loginSheet");
+  /* ---------- sign-in page ---------- */
   const normHandle = (h) => h.trim().replace(/^@/, "").toLowerCase();
+  const loginErr = $("#loginError");
   const renderAuth = () => {
     $("#navSignIn").hidden = unlocked; $("#navUser").hidden = !unlocked;
     $("#navAvatar").textContent = (profile.name.trim()[0] || "?").toUpperCase();
     $("#navName").textContent = profile.handle.replace(/^@/, "");
   };
-  const openLogin = () => {
-    $("#loginError").hidden = true; $("#loginPass").value = "";
+  const showSignIn = () => {
+    loginErr.hidden = true; $("#loginPass").value = "";
     $("#loginUser").placeholder = profile.handle;
-    loginSheet.hidden = false; setTimeout(() => $("#loginUser").focus(), 50);
+    startSlides();
+    setTimeout(() => $("#loginUser").focus({ preventScroll: true }), 60);
   };
-  const closeLogin = () => { loginSheet.hidden = true; };
+  const goSignIn = () => {
+    const cur = (location.hash.replace("#", "") || "home");
+    if (cur !== "signin") afterSignIn = cur;
+    location.hash = "#signin";
+  };
+  const continueAsGuest = (dest) => {
+    sessionStorage.setItem(KEY_GUEST, "1");
+    location.hash = "#" + (dest || (afterSignIn === "inbox" ? "home" : afterSignIn));
+  };
   $("#loginForm").addEventListener("submit", (e) => {
     e.preventDefault();
     const u = normHandle($("#loginUser").value), p = $("#loginPass").value;
     const nameMatch = u === normHandle(profile.handle) || u === profile.name.trim().toLowerCase();
-    if (!u || !p) { $("#loginError").textContent = "أدخل اسم المستخدم ورمز الدخول."; $("#loginError").hidden = false; return; }
-    if (!nameMatch || p !== profile.pass) { $("#loginError").textContent = "اسم المستخدم أو رمز الدخول غير صحيح."; $("#loginError").hidden = false; $("#loginPass").select(); return; }
+    if (!u || !p) { loginErr.textContent = "أدخل اسم المستخدم ورمز الدخول."; loginErr.hidden = false; return; }
+    if (!nameMatch || p !== profile.pass) { loginErr.textContent = "اسم المستخدم أو رمز الدخول غير صحيح."; loginErr.hidden = false; $("#loginPass").select(); return; }
     unlocked = true; sessionStorage.setItem(KEY_UNLOCK, "1"); sessionStorage.removeItem(KEY_GUEST);
-    closeLogin(); renderAuth(); toast(`Welcome back, ${profile.name.split(" ")[0]}`);
-    location.hash = "#inbox"; renderInbox();
+    if ($("#loginRemember").checked) { try { localStorage.setItem(KEY_UNLOCK, "1"); } catch {} }
+    renderAuth(); toast(`Welcome back, ${profile.name.split(" ")[0]}`);
+    location.hash = "#inbox";
   });
-  $("#loginGuest").addEventListener("click", () => { sessionStorage.setItem(KEY_GUEST, "1"); closeLogin(); ta.focus(); });
-  $("#navSignIn").addEventListener("click", openLogin);
-  $("#lockSignIn").addEventListener("click", openLogin);
+  $("#passToggle").addEventListener("click", (e) => {
+    const b = e.currentTarget, inp = $("#loginPass"), show = inp.type === "password";
+    inp.type = show ? "text" : "password";
+    b.setAttribute("aria-pressed", String(show)); b.setAttribute("aria-label", show ? "Hide passcode" : "Show passcode");
+    inp.focus();
+  });
+  $("#loginGuest").addEventListener("click", () => continueAsGuest());
+  $("#authClose").addEventListener("click", (e) => { e.preventDefault(); continueAsGuest(); });
+  $$(".auth-links [data-guest]").forEach(a => a.addEventListener("click", (e) => { e.preventDefault(); continueAsGuest(a.getAttribute("href").slice(1)); }));
+  $("#authTheme").addEventListener("click", () => $("#themeToggle").click());
+  $("#navSignIn").addEventListener("click", goSignIn);
+  $("#lockSignIn").addEventListener("click", goSignIn);
   $("#navUser").addEventListener("click", () => { location.hash = "#inbox"; });
-  loginSheet.addEventListener("click", (e) => { if (e.target === loginSheet) { sessionStorage.setItem(KEY_GUEST, "1"); closeLogin(); } });
+
+  /* ---------- sign-in slides ---------- */
+  const slides = $$(".slide"), dots = $$("#slideDots .dot");
+  let slideIdx = 0, slideTimer = null;
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const showSlide = (i) => {
+    slideIdx = (i + slides.length) % slides.length;
+    slides.forEach((s, k) => s.classList.toggle("is-active", k === slideIdx));
+    dots.forEach((d, k) => { d.classList.toggle("is-active", k === slideIdx); d.setAttribute("aria-selected", String(k === slideIdx)); });
+  };
+  const stopSlides = () => { clearInterval(slideTimer); slideTimer = null; };
+  const startSlides = () => { stopSlides(); if (!reduceMotion) slideTimer = setInterval(() => showSlide(slideIdx + 1), 5000); };
+  $("#slideNext").addEventListener("click", () => { showSlide(slideIdx + 1); startSlides(); });
+  $("#slidePrev").addEventListener("click", () => { showSlide(slideIdx - 1); startSlides(); });
+  dots.forEach((d, k) => d.addEventListener("click", () => { showSlide(k); startSlides(); }));
 
   $("#lockBtn").addEventListener("click", () => {
     unlocked = false; sessionStorage.removeItem(KEY_UNLOCK); sessionStorage.setItem(KEY_GUEST, "1");
+    try { localStorage.removeItem(KEY_UNLOCK); } catch {}
     renderAuth(); toast("تم تسجيل الخروج"); location.hash = "#home"; renderInbox();
   });
   $$(".filter").forEach(b => b.addEventListener("click", () => {
@@ -262,7 +302,6 @@
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;
     if (!sheet.hidden) closeSettings();
-    if (!loginSheet.hidden) { sessionStorage.setItem(KEY_GUEST, "1"); closeLogin(); }
   });
   $("#settingsForm").addEventListener("submit", (e) => {
     e.preventDefault();
@@ -279,6 +318,10 @@
   updateCounter();
   renderProfile();
   renderAuth();
+  const entry = (location.hash.replace("#", "") || "home");
+  if (!unlocked && sessionStorage.getItem(KEY_GUEST) !== "1" && entry !== "signin") {
+    afterSignIn = entry;
+    history.replaceState(null, "", "#signin");
+  }
   route();
-  if (!unlocked && sessionStorage.getItem(KEY_GUEST) !== "1") openLogin();
 })();
